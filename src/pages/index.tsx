@@ -1,12 +1,10 @@
 import * as React from 'react';
 import Head from 'next/head';
 import Map, {Layer, MapLayerMouseEvent, MapRef, Source} from 'react-map-gl';
-import {useCallback, useRef} from 'react';
+import { useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import zones from '../../zones.json';
-
 import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
-import mapboxgl from 'mapbox-gl';
 
 export default function Home() {
   const mapRef = useRef<MapRef>(null);
@@ -27,7 +25,7 @@ export default function Home() {
           { hover: true }
         );
       }
-      });
+    });
       
       mapRef.current?.on('mouseleave', 'zone-fills', () => {
         if (hoveredPolygonId !== null) {
@@ -36,7 +34,7 @@ export default function Home() {
             { hover: false }
           );
         }
-      hoveredPolygonId = null;
+        hoveredPolygonId = null;
       });
 
       mapRef.current?.on('click', 'zone-fills', (e) => {
@@ -44,6 +42,8 @@ export default function Home() {
           console.log(e.features[0].properties?.name);
         }
       });
+
+      
   }
 
   return (
@@ -61,7 +61,7 @@ export default function Home() {
         }}
         interactiveLayerIds={["zones"]}
         style={{left: 0, width: "100vw", height: "100vh"}}
-        mapStyle="mapbox://styles/jolerus/clh4z2ham00pl01quabbchxqc"
+        mapStyle="mapbox://styles/jolerus/clh4z2ham00pl01quabbchxqc/draft"
         mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
       >
         <Source id="zones" type="geojson" data={zones}>
