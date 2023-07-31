@@ -8,15 +8,18 @@ fs.readFile('london_zones.json', 'utf8', (err, data) => {
   }
 
   const obj = JSON.parse(data);
-  const centroids = [];
+  var geojson = {
+      "name":"NewFeatureType",
+      "type":"FeatureCollection",
+      "features":[]
+  };
   for (var i = 0; i < obj.features.length; i++) {
     let centroid = turf.centroid(obj.features[i]);
     centroid.id = obj.features[i].id;
     centroid.properties = obj.features[i].properties;
-    centroids.push(centroid);
+    geojson.features.push(centroid);
   }
-  console.log(centroids);
-  fs.writeFile('london_centroids.json', JSON.stringify(centroids), (err) => {
+  fs.writeFile('london_centroids.json', JSON.stringify(geojson), (err) => {
     if (err) {
       console.error(err);
       return;

@@ -3,7 +3,8 @@ import Head from 'next/head';
 import Map, {Layer, MapLayerMouseEvent, MapRef, Source} from 'react-map-gl';
 import { useRef } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import zones from '../../zones.json';
+import zones from '../../london_zones.json';
+import centroids from '../../london_centroids.json';
 import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
 
 export default function Home() {
@@ -89,6 +90,21 @@ export default function Home() {
               'line-width': 2}
             }}
           />
+        </Source>
+        <Source id="centroids" type="geojson" data={centroids}>
+          <Layer
+              {... {
+                'id': 'poi-labels',
+                'type': 'symbol',
+                'source': 'places',
+                'layout': {
+                  'text-field': ['get', 'name'],
+                  'text-variable-anchor': ['bottom'],
+                  'text-radial-offset': 0.5,
+                  'text-justify': 'auto',
+                }
+              }}
+            />
         </Source>
       </Map>
     </div>
