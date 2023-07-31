@@ -6,6 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import zones from '../../zones.json';
 
 import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
+import mapboxgl from 'mapbox-gl';
 
 export default function Home() {
   const mapRef = useRef<MapRef>(null);
@@ -28,8 +29,6 @@ export default function Home() {
       }
       });
       
-      // When the mouse leaves the state-fill layer, update the feature state of the
-      // previously hovered feature.
       mapRef.current?.on('mouseleave', 'zone-fills', () => {
         if (hoveredPolygonId !== null) {
           mapRef.current?.setFeatureState(
@@ -38,7 +37,13 @@ export default function Home() {
           );
         }
       hoveredPolygonId = null;
-    });
+      });
+
+      mapRef.current?.on('click', 'zone-fills', (e) => {
+        if (e.features && e.features.length > 0) {
+          console.log(e.features[0].properties?.name);
+        }
+      });
   }
 
   return (
@@ -70,7 +75,7 @@ export default function Home() {
                 'fill-opacity': [
                   'case', ['boolean', ['feature-state', 'hover'], false], 1, 0.5
                 ]
-              }
+              },
             }}
           />
           <Layer
