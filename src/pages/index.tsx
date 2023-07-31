@@ -10,33 +10,35 @@ import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
 export default function Home() {
   const mapRef = useRef<MapRef>(null);
 
-  let hoveredZoneId: number | null = null;
-  const handleMouseMove = (event: MapLayerMouseEvent) => {
-    if (mapRef.current && event.features && event.features.length > 0 && event.features[0].properties && event.features[0]?.id) {
-      mapRef.current.getCanvas().style.cursor = 'pointer';
-
-      if (hoveredZoneId) {
-        mapRef.current.removeFeatureState(
-          {
-            source: 'zones-src',
-            id: hoveredZoneId
-          }
+  const handleMapLoad = () => {
+    let hoveredPolygonId: number | null = null;
+    mapRef.current?.on('mousemove', 'zone-fills', (e) => {
+      if (e.features && e.features.length > 0) {
+        if (hoveredPolygonId !== null) {
+          mapRef.current?.setFeatureState(
+            { source: 'zones', id: hoveredPolygonId },
+            { hover: false }
+          );
+        }
+        hoveredPolygonId = Number(e.features[0].id);
+        mapRef.current?.setFeatureState(
+          { source: 'zones', id: hoveredPolygonId },
+          { hover: true }
         );
       }
-
-      hoveredZoneId = Number(event.features[0].id);
-
-      console.log("2")
-      mapRef.current.setFeatureState(
-        {
-          source: 'zones-src',
-          id: hoveredZoneId
-        },
-        {
-          hover: true
+      });
+      
+      // When the mouse leaves the state-fill layer, update the feature state of the
+      // previously hovered feature.
+      mapRef.current?.on('mouseleave', 'zone-fills', () => {
+        if (hoveredPolygonId !== null) {
+          mapRef.current?.setFeatureState(
+            { source: 'zones', id: hoveredPolygonId },
+            { hover: false }
+          );
         }
-      );
-    }
+      hoveredPolygonId = null;
+    });
   }
 
   return (
@@ -46,7 +48,7 @@ export default function Home() {
       </Head>
       <Map
         ref={mapRef}
-        onMouseMove={(e) => handleMouseMove(e)}
+        onLoad={handleMapLoad}
         initialViewState={{
           latitude: 51.48,
           longitude: -0.115,
@@ -57,10 +59,30 @@ export default function Home() {
         mapStyle="mapbox://styles/jolerus/clh4z2ham00pl01quabbchxqc"
         mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
       >
-        <Source id="zones-src" type="geojson" data={zones}>
+        <Source id="zones" type="geojson" data={zones}>
           <Layer
-            id="zones"
-            type="line"
+            {... {'id': 'zone-fills',
+              'type': 'fill',
+              'source': 'states',
+              'layout': {},
+              'paint': {
+                'fill-color': '#627BC1',
+                'fill-opacity': [
+                  'case', ['boolean', ['feature-state', 'hover'], false], 1, 0.5
+                ]
+              }
+            }}
+          />
+          <Layer
+            {... {
+              'id': 'zone-borders',
+              'type': 'line',
+              'source': 'states',
+              'layout': {},
+              'paint': {
+              'line-color': '#627BC1',
+              'line-width': 2}
+            }}
           />
         </Source>
       </Map>
