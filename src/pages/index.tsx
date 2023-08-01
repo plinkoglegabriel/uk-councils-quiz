@@ -104,8 +104,9 @@ export default function Home() {
               'paint': {
                 'fill-color': '#627BC1',
                 'fill-opacity': [
-                  'case', ['==', ['feature-state', 'url'], null], 0,
-                  ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.3],
+                  'case', ['boolean', ['to-boolean', ['feature-state', 'url']], false], 
+                    ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.3],
+                    ['case', ['boolean', ['feature-state', 'hover'], false], 0, 0]
                 ]
               },
             }}
