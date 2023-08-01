@@ -6,11 +6,19 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import zones from '../../london_zones.json';
 import centroids from '../../london_centroids.json';
 import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
+import useSWR from 'swr'
+import { Client } from "@notionhq/client"
 
 export default function Home() {
   const mapRef = useRef<MapRef>(null);
 
   const handleMapLoad = () => {
+
+    const fetchResult = fetch(`/api/councils`, {})
+    .then((response) => response.json().then((data) => {
+      console.log(data);
+    }));
+
     let hoveredPolygonId: number | null = null;
     mapRef.current?.on('mousemove', 'zone-fills', (e) => {
       if (e.features && e.features.length > 0) {
