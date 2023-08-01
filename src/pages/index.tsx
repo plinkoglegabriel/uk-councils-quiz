@@ -112,7 +112,11 @@ export default function Home() {
               'source': 'states',
               'layout': {},
               'paint': {
-                'fill-color': '#627BC1',
+                'fill-color': [
+                  'case', ['boolean', ['to-boolean', ['feature-state', 'color']], false],
+                  ['feature-state', 'color'],
+                  '#627BC1'
+                ],
                 'fill-opacity': [
                   'case', ['boolean', ['to-boolean', ['feature-state', 'url']], false], 
                     ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.3],
