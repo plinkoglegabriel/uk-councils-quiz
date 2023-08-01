@@ -1,22 +1,39 @@
 import * as React from 'react';
 import Head from 'next/head';
 import Map, {Layer, MapLayerMouseEvent, MapRef, Source} from 'react-map-gl';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import zones from '../../london_zones.json';
 import centroids from '../../london_centroids.json';
 import { MAPBOX_ACCESS_TOKEN } from '../../mapboxtoken';
-import useSWR from 'swr'
-import { Client } from "@notionhq/client"
 
 export default function Home() {
   const mapRef = useRef<MapRef>(null);
+  const unHoveredColor = ""
+  const councilData = useState({});
 
   const handleMapLoad = () => {
 
     const fetchResult = fetch(`/api/councils`, {})
     .then((response) => response.json().then((data) => {
-      console.log(data);
+      const features = mapRef.current?.querySourceFeatures('zones', {
+        sourceLayer: 'zone-fills',
+      });
+
+      data.results.forEach((notionZone: any) => {
+        console.log(notionZone);
+        features?.forEach((featureZone) => {
+          if (notionZone.properties.Name.title[0].plain_text === featureZone.properties?.name) {
+            mapRef.current?.setFeatureState(
+              { source: 'zones', id: featureZone.id },
+              { status: notionZone.properties.Status.status.name,
+                color: notionZone.properties.Status.status.color,
+                url: notionZone.url
+              }
+            );
+          }
+        });
+      });
     }));
 
     let hoveredPolygonId: number | null = null;
@@ -48,7 +65,13 @@ export default function Home() {
 
       mapRef.current?.on('click', 'zone-fills', (e) => {
         if (e.features && e.features.length > 0) {
-          console.log(e.features[0].properties?.name);
+          const featureState = mapRef.current?.getFeatureState(
+            { source: 'zones', id: e.features[0]?.id}
+          );
+          const url = featureState?.url;
+          if (url) {
+            window.open(url, '_blank');
+          }
         }
       });
 
@@ -82,7 +105,7 @@ export default function Home() {
               'paint': {
                 'fill-color': '#627BC1',
                 'fill-opacity': [
-                  'case', ['boolean', ['feature-state', 'hover'], false], 1, 0.5
+                  'case', ['boolean', ['feature-state', 'hover'], false], 1, 0.2
                 ]
               },
             }}
@@ -94,7 +117,7 @@ export default function Home() {
               'source': 'states',
               'layout': {},
               'paint': {
-              'line-color': '#627BC1',
+              'line-color': '#000000',
               'line-width': 2}
             }}
           />
