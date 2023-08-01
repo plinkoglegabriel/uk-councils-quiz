@@ -21,7 +21,6 @@ export default function Home() {
       });
 
       data.results.forEach((notionZone: any) => {
-        console.log(notionZone);
         features?.forEach((featureZone) => {
           if (notionZone.properties.Name.title[0].plain_text === featureZone.properties?.name) {
             mapRef.current?.setFeatureState(
@@ -105,7 +104,8 @@ export default function Home() {
               'paint': {
                 'fill-color': '#627BC1',
                 'fill-opacity': [
-                  'case', ['boolean', ['feature-state', 'hover'], false], 1, 0.2
+                  'case', ['==', ['feature-state', 'url'], null], 0,
+                  ['case', ['boolean', ['feature-state', 'hover'], false], 1, 0.3],
                 ]
               },
             }}
