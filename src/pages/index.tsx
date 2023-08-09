@@ -23,7 +23,8 @@ export default function Home() {
 
       data.results.forEach((notionZone: any) => {
         features?.forEach((featureZone) => {
-          if (notionZone.properties.Name.title[0].plain_text === featureZone.properties?.name) {
+          console.log(notionZone)
+          if (notionZone.properties.Name.title[0]?.plain_text === featureZone.properties?.name) {
             mapRef.current?.setFeatureState(
               { source: 'zones', id: featureZone.id },
               { status: notionZone.properties.Status.status.name,
