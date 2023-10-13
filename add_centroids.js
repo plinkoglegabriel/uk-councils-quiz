@@ -1,7 +1,7 @@
 const fs = require('fs');
 const turf = require('turf')
 
-fs.readFile('london_zones.json', 'utf8', (err, data) => {
+fs.readFile('zones.json', 'utf8', (err, data) => {
   if (err) {
     console.error(err);
     return;
@@ -19,7 +19,7 @@ fs.readFile('london_zones.json', 'utf8', (err, data) => {
     centroid.properties = obj.features[i].properties;
     geojson.features.push(centroid);
   }
-  fs.writeFile('london_centroids.json', JSON.stringify(geojson), (err) => {
+  fs.writeFile('centroids.json', JSON.stringify(geojson), (err) => {
     if (err) {
       console.error(err);
       return;
